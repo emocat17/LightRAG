@@ -5,6 +5,8 @@ from lightrag.llm.openai import openai_complete_if_cache
 from lightrag.llm.siliconcloud import siliconcloud_embedding
 from lightrag.utils import EmbeddingFunc
 import numpy as np
+from dotenv import load_dotenv
+load_dotenv() #配置APIKEY,写在.env中
 
 WORKING_DIR = "./dickens"
 
@@ -16,7 +18,8 @@ async def llm_model_func(
     prompt, system_prompt=None, history_messages=[], keyword_extraction=False, **kwargs
 ) -> str:
     return await openai_complete_if_cache(
-        "Qwen/Qwen2.5-7B-Instruct",
+        # "QPro/deepseek-ai/DeepSeek-R1", #满血版
+        "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B", #Distill版
         prompt,
         system_prompt=system_prompt,
         history_messages=history_messages,
@@ -29,7 +32,8 @@ async def llm_model_func(
 async def embedding_func(texts: list[str]) -> np.ndarray:
     return await siliconcloud_embedding(
         texts,
-        model="netease-youdao/bce-embedding-base_v1",
+        # model="BAAI/bge-large-zh-v1.5",
+        model="BAAI/bge-large-en-v1.5",
         api_key=os.getenv("SILICONFLOW_API_KEY"),
         max_token_size=512,
     )
@@ -39,7 +43,7 @@ async def embedding_func(texts: list[str]) -> np.ndarray:
 async def test_funcs():
     result = await llm_model_func("How are you?")
     print("llm_model_func: ", result)
-
+    
     result = await embedding_func(["How are you?"])
     print("embedding_func: ", result)
 
